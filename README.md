@@ -1,440 +1,259 @@
-# ConceptGuide
+ConceptGuide
 
-**An AI-Powered Learning Companion for Understanding Complex Concepts**
+An AI-Powered Learning Companion for Understanding Complex Concepts
 
-ConceptGuide is an intelligent educational platform that helps students understand confusing concepts from PDF documents through personalized diagnostic questioning and adaptive learning paths. The application uses AI to analyze student responses, generate concept dependency maps, and create customized learning experiences.
+ConceptGuide is an intelligent, AI-powered educational platform that transforms how students learn from complex educational materials. Instead of passively reading, ConceptGuide actively diagnoses learning gaps, visualizes concept relationships, and creates personalized learning paths tailored to each student's specific needs.
 
-## 🎯 What is ConceptGuide?
+📋 Table of Contents
 
-ConceptGuide is a web-based learning tool designed to help students overcome confusion when reading educational materials. Instead of simply providing answers, ConceptGuide:
+The Challenge
 
-1. **Identifies Confusion**: Students highlight text they find confusing in a PDF
-2. **Diagnoses Understanding**: Asks 5 targeted questions across different cognitive levels (Vocabulary, Motivation, Foundation, Misconception, Application)
-3. **Visualizes Dependencies**: Creates an interactive mind map showing concept relationships and prerequisites
-4. **Personalizes Learning**: Generates a step-by-step learning path tailored to the student's specific gaps
-5. **Guides Progress**: Provides interactive learning cards with explanations, examples, and practice problems
+Our Solution
 
-## 👥 Who Can Use ConceptGuide?
+Key Features
 
-### Primary Users:
-- **Students** learning from textbooks, research papers, or educational PDFs
-- **Self-learners** studying independently who need structured guidance
-- **Educators** who want to understand student comprehension gaps
+Technology Stack
 
-### Ideal For:
-- Complex technical subjects (mathematics, computer science, engineering)
-- Abstract concepts that require foundational understanding
-- Topics where prerequisite knowledge is critical
-- Students who struggle with self-assessment
+Architecture
 
-## ✨ Key Features
+Getting Started
 
-### 📄 PDF Processing
-- Upload PDF documents via drag-and-drop or file selection
-- Automatic text extraction and organization
-- Clean, structured content display with headings and formatting
-- Text selection and highlighting capabilities
+How to Use
 
-### ❓ Intelligent Question Generation
-- 5-level diagnostic question structure:
-  - **Level 1**: Vocabulary/Definition (surface clarity)
-  - **Level 2**: Purpose/Motivation (contextual understanding)
-  - **Level 3**: Foundation Check (prerequisites)
-  - **Level 4**: Mental Model Audit (misconceptions)
-  - **Level 5**: Application Bridge (real-world connection)
-- Conversational, beginner-friendly questions (under 20 words each)
-- AI-generated based on selected text and full document context
+Contributing
 
-### 🗺️ Concept Dependency Mapping
-- Interactive mind map visualization using ReactFlow
-- Color-coded nodes by depth:
-  - **Green** (#27C93F): Foundation concepts (Depth 0)
-  - **Pink** (#FF4081): Intermediate concepts (Depth 1)
-  - **Yellow** (#FFBD2E): Advanced concepts (Depth 2)
-  - **Red** (#FF5F56): Target concepts (Depth 3)
-  - **Purple** (#9B59B6): Advanced topics (Depth 4+)
-- Shows critical and helpful relationships between concepts
-- Recommended learning path visualization
+License
 
-### 🎓 Personalized Learning Path
-- **Comprehensive Coverage**: Learning path includes steps for EVERY node from the mind map, not just the recommended path
-- Step-by-step learning cards ordered by depth and importance
-- Each card includes:
-  - **Why This Step Matters**: Personalization explanation
-  - **Concept Explanation**: Clear, structured content
-  - **Examples**: Real-world applications
-  - **Practice Problems**: Interactive multiple-choice questions (must be solved before proceeding)
-  - **Progress Tracking**: Visual progress bar and step indicators
-- Answers persist across navigation (Previous/Next buttons)
-- Users cannot mark a step complete until they solve the practice problem
-- Completion celebration and automatic return to home
+Acknowledgments
 
-### 🎨 Modern UI/UX
-- Retro-terminal/hacker-girl theme with neon pink accents
-- Dark mode optimized (#1A1A1A background)
-- Gradient borders and window controls
-- Responsive design
-- Smooth animations and transitions
+🔍 The Challenge
 
-## 🛠️ Technology Stack
+Students learning from textbooks, research papers, and educational PDFs face several critical challenges:
 
-### Frontend
-- **React 19** - Modern UI framework
-- **Vite** - Fast build tool and dev server
-- **Tailwind CSS** - Utility-first styling
-- **Zustand** - Lightweight state management
-- **ReactFlow** - Interactive graph visualization
-- **pdfjs-dist** - PDF rendering and text extraction
-- **Firebase** - Authentication (optional)
+Passive Learning: Traditional reading is passive; students don't know if they truly understand until they're tested.
 
-### Backend
-- **Node.js** - Runtime environment
-- **Express** - Web server framework
-- **Google Generative AI (Gemini 2.0 Flash)** - AI-powered analysis and generation
-- **CORS** - Cross-origin resource sharing
+Hidden Confusion: Students often don't realize they're confused until they fail an exam or assignment.
 
-## 📋 Prerequisites
+Prerequisite Gaps: Complex concepts build on foundations. If a student misses a prerequisite, everything after becomes incomprehensible.
 
-Before setting up ConceptGuide, ensure you have:
+One-Size-Fits-All: Educational materials assume all students have the same background knowledge.
 
-- **Node.js** (v18 or higher) and npm installed
-- A **Google AI API key** (get one from [Google AI Studio](https://makersuite.google.com/app/apikey))
-- A modern web browser (Chrome, Firefox, Edge, Safari)
-- Basic knowledge of terminal/command line
+Isolated Concepts: Students struggle to see how concepts relate to each other and build upon one another.
 
-## 🚀 Setup Instructions
+💡 Our Solution
 
-### 1. Clone the Repository
+ConceptGuide solves these problems through a 5-stage diagnostic and personalized learning system:
 
-```bash
-git clone <repository-url>
-cd csgirlies
-```
+Intelligent Confusion Detection: Students highlight text they find confusing, triggering an AI-powered diagnostic process.
 
-### 2. Install Dependencies
+5-Level Diagnostic Questioning: The system asks 5 targeted questions to pinpoint the exact nature of the confusion (Vocabulary, Foundation, Misconception, etc.).
 
-```bash
+AI-Powered Analysis: Google's Gemini AI analyzes student responses to identify specific knowledge gaps and calculate mastery scores.
+
+Visual Concept Mapping: An interactive mind map is generated, visualizing all related concepts, their prerequisite dependencies, and a recommended learning path.
+
+Personalized Learning Path: A step-by-step learning experience is created, covering every concept from the mind map with explanations, examples, and mandatory practice problems to ensure comprehension.
+
+✨ Key Features
+
+📄 PDF Processing: Upload any PDF, and the system automatically extracts and organizes the text for easy reading and interaction.
+
+🧠 AI-Powered Diagnostics: Select confusing text to generate 5 levels of diagnostic questions that pinpoint the root of your misunderstanding.
+
+🗺️ Interactive Concept Maps: Visualize the relationships between concepts with an interactive, color-coded dependency graph powered by ReactFlow.
+
+🎓 Personalized Learning Paths: Receive a step-by-step "repair path" that guides you through foundational concepts up to the target topic, complete with explanations, examples, and practice problems.
+
+🎤 Voice-to-Text Input: Answer questions using your voice with built-in, browser-based speech recognition.
+
+📊 Progress Tracking & History: All sessions are saved to your account. Review past analyses, resume learning paths, and gain insights into your common confusion types and strongest subjects.
+
+🔐 Authentication: Secure user accounts with Firebase for data persistence and cross-device access.
+
+🛠️ Technology Stack
+Frontend
+Technology	Purpose
+React	UI framework for component architecture
+Vite	Fast build tool and dev server
+Tailwind CSS	Utility-first CSS framework
+Zustand	Lightweight state management
+ReactFlow	Interactive graph visualization
+pdfjs-dist	PDF rendering and text extraction
+Firebase	Authentication and Firestore database
+Backend
+Technology	Purpose
+Node.js	JavaScript runtime environment
+Express	Web server framework
+Google Generative AI	Gemini AI model integration
+CORS	Cross-origin resource sharing
+dotenv	Environment variable management
+🏛️ Architecture
+
+The system uses a React frontend that communicates with a Node.js/Express backend. The backend orchestrates calls to the Google Gemini AI for all intelligent processing. Firebase is used for user authentication and data persistence.
+
+code
+Code
+download
+content_copy
+expand_less
+┌─────────────────────────────────────────────────────────────┐
+│                        Frontend (React)                      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   Components │  │  Zustand    │  │  React Router│      │
+│  │              │  │   Stores    │  │              │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│         │                  │                  │            │
+│         └──────────────────┼──────────────────┘            │
+│                            │                                 │
+└────────────────────────────┼─────────────────────────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   Express API   │
+                    │   (Port 3001)   │
+                    └────────┬────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                     │
+┌───────▼────────┐  ┌────────▼────────┐  ┌───────▼────────┐
+│  Gemini AI     │  │   Firebase      │  │  PDF.js        │
+│  (Analysis)    │  │  (Auth/DB)      │  │  (Client-side)  │
+└────────────────┘  └─────────────────┘  └────────────────┘
+🚀 Getting Started
+Prerequisites
+
+Node.js (v18 or higher)
+
+npm or yarn
+
+Git
+
+Google Account (for Gemini API key)
+
+1. Clone the Repository
+code
+Bash
+download
+content_copy
+expand_less
+git clone https://github.com/your-username/ConceptGuide.git
+cd ConceptGuide
+2. Install Dependencies
+code
+Bash
+download
+content_copy
+expand_less
 npm install
-```
+3. Configure Environment Variables
 
-This will install all required packages including:
-- React and related libraries
-- Express and backend dependencies
-- PDF processing libraries
-- ReactFlow for graph visualization
-- Firebase SDK (for authentication)
+Create a .env file in the root directory and add your Google Gemini API key.
 
-### 3. Configure Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
+code
+Env
+download
+content_copy
+expand_less
+# Required: Google Gemini API Key
 GEMINI_API_KEY=your_google_ai_api_key_here
+
+# Optional: Server Port (defaults to 3001)
 PORT=3001
-```
 
-**Getting a Google AI API Key:**
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key and paste it into your `.env` file
+Get a Google AI API Key:
 
-### 4. (Optional) Firebase Setup for Authentication
+Visit Google AI Studio.
 
-If you want to use authentication features:
+Click "Create API Key" and copy the key.
 
-1. Create a Firebase project at [Firebase Console](https://console.firebase.google.com/)
-2. Enable Email/Password authentication
-3. Create a Firestore database
-4. Add your Firebase config to `.env`:
+4. (Optional) Firebase Setup
 
-```env
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
+For user accounts and data persistence, set up a Firebase project and add the configuration to your .env file. See FIREBASE_SETUP.md for a detailed guide.
 
-See `FIREBASE_SETUP.md` for detailed instructions.
+code
+Env
+download
+content_copy
+expand_less
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+# ... and other Firebase variables
+5. Start the Servers
 
-### 5. Start the Development Servers
+You need to run the backend and frontend servers in two separate terminals.
 
-**Terminal 1 - Backend Server:**
-```bash
-npm run server
-```
+Terminal 1: Start the Backend Server
 
-The backend will start on `http://localhost:3001`
-
-**Terminal 2 - Frontend Development Server:**
-```bash
-npm run dev
-```
-
-The frontend will start on `http://localhost:5173` (or the port Vite assigns)
-
-### 6. Access the Application
-
-Open your browser and navigate to:
-```
-http://localhost:5173
-```
-
-## 📁 Project Structure
-
-```
-csgirlies/
-├── src/
-│   ├── components/
-│   │   ├── Layout.jsx              # Main layout with sidebars
-│   │   ├── TopNavBar.jsx           # Navigation bar
-│   │   ├── LeftSidebar.jsx         # History sidebar (currently disabled)
-│   │   ├── RightSidebar.jsx       # PDF content display
-│   │   ├── CenterColumn.jsx        # Main content area
-│   │   ├── PDFUpload.jsx           # PDF upload component
-│   │   ├── PDFViewer.jsx           # PDF viewer with selection
-│   │   ├── QuestionModal.jsx      # Question answering interface
-│   │   ├── Person2Integration.jsx  # Integration point for learning experience
-│   │   ├── LearningExperience.jsx  # Main learning flow controller
-│   │   ├── DiagnosticSummary.jsx   # AI analysis summary
-│   │   ├── DependencyGraph.jsx     # Interactive mind map
-│   │   ├── RepairPath.jsx          # Learning path container
-│   │   ├── LearningCard.jsx        # Individual learning step
-│   │   ├── Congratulations.jsx     # Completion animation
-│   │   ├── AuthModal.jsx           # Authentication modal
-│   │   └── VoiceRecorder.jsx       # Voice input component
-│   ├── store/
-│   │   ├── useAppStore.js          # Main application state
-│   │   └── useAuthStore.js         # Authentication state
-│   ├── firebase/
-│   │   └── config.js               # Firebase configuration
-│   ├── assets/                     # Static assets
-│   ├── App.jsx                     # Root component
-│   ├── main.jsx                    # Entry point
-│   └── index.css                   # Global styles
-├── public/
-│   └── logo.png                    # Application logo
-├── server.js                       # Express backend server
-├── package.json                    # Dependencies and scripts
-├── vite.config.js                  # Vite configuration
-├── tailwind.config.js              # Tailwind CSS configuration
-├── postcss.config.js               # PostCSS configuration
-├── .env                            # Environment variables (create this)
-├── README.md                       # This file
-├── FIREBASE_SETUP.md               # Firebase setup guide
-└── TESTING_GUIDE.md                # Testing instructions
-```
-
-## 🔌 API Endpoints
-
-### POST `/api/generate-questions`
-
-Generates 5 diagnostic questions based on selected text.
-
-**Request Body:**
-```json
-{
-  "selectedText": "The confusing text from PDF",
-  "surroundingContext": "Context around the selected text",
-  "fullPdfText": "Complete PDF content"
-}
-```
-
-**Response:**
-```json
-{
-  "questions": [
-    {
-      "level": 1,
-      "type": "Vocabulary",
-      "question": "What does [concept] mean in your own words?",
-      "expectedKeywords": ["keyword1", "keyword2", "keyword3"]
-    },
-    ...
-  ]
-}
-```
-
-### POST `/api/clean-pdf-content`
-
-Cleans and organizes raw PDF text for better display.
-
-**Request Body:**
-```json
-{
-  "rawText": "Unformatted PDF text"
-}
-```
-
-**Response:**
-```json
-{
-  "cleanedText": "Organized text with headings and structure"
-}
-```
-
-### POST `/api/analyze-and-generate-path`
-
-Performs complete analysis and generates learning path. This is the main endpoint that:
-1. Analyzes student responses
-2. Generates concept dependency mind map
-3. Creates personalized learning path
-
-**Request Body:**
-```json
-{
-  "selectedText": "Original confusing text",
-  "qaPairs": [
-    {
-      "question": "Question text",
-      "answer": "Student's answer"
-    },
-    ...
-  ]
-}
-```
-
-**Response:**
-```json
-{
-  "analysis": {
-    "confusionType": "vocabulary|foundation|misconception|application",
-    "specificGaps": ["gap1", "gap2", ...],
-    "prerequisiteConcepts": ["concept1", "concept2", ...]
-  },
-  "mindMap": {
-    "nodes": [...],
-    "edges": [...],
-    "recommendedPath": ["nodeId1", "nodeId2", ...]
-  },
-  "repairPath": {
-    "steps": [
-      {
-        "stepNumber": 1,
-        "conceptName": "Concept name",
-        "explanation": "...",
-        "examples": [...],
-        "practiceProblem": {...}
-      },
-      ...
-    ]
-  }
-}
-```
-
-## 🎮 Usage Flow
-
-1. **Upload PDF**: Drag and drop or select a PDF file
-2. **Read Content**: View organized PDF content in the right sidebar
-3. **Select Confusing Text**: Highlight text you don't understand
-4. **Click "I'm confused about this"**: Opens question modal
-5. **Answer Questions**: Answer all 5 diagnostic questions (text or voice input)
-6. **Submit Answers**: Review and submit your responses
-7. **View Analysis**: See AI-generated diagnostic summary
-8. **Explore Mind Map**: Interact with the concept dependency graph showing all related concepts
-9. **Follow Learning Path**: Complete step-by-step learning cards for EVERY concept in the mind map
-10. **Practice**: Answer practice problems (required before proceeding) and track progress
-11. **Complete**: Celebrate completion and return to home
-
-## 🎨 Theme & Styling
-
-ConceptGuide uses a retro-terminal/hacker-girl theme:
-
-- **Main Background**: `#1A1A1A` (dark gray)
-- **Panel Background**: `#2D2D2D` (lighter gray)
-- **Primary Accent**: `#FF4081` (neon pink)
-- **Gradient End**: `#E0007A` (hot magenta)
-- **Text Color**: `#F5D9E4` (light pink)
-- **Heading Color**: `#FFFFFF` (white)
-- **Font**: Poppins (Google Fonts)
-
-All panels feature:
-- Gradient borders (pink to magenta)
-- Window control dots (red, yellow, green)
-- Rounded corners (`rounded-lg`)
-
-## 🐛 Troubleshooting
-
-### Backend Server Won't Start
-- Check that port 3001 is not in use
-- Verify `GEMINI_API_KEY` is set in `.env`
-- Ensure all dependencies are installed: `npm install`
-
-### Questions Not Generating
-- Verify your Google AI API key is valid
-- Check browser console for error messages
-- Ensure backend server is running on port 3001
-- Check API quota limits in Google AI Studio
-
-### PDF Not Loading
-- Ensure PDF file is not corrupted
-- Check browser console for PDF.js errors
-- Try a different PDF file
-- Clear browser cache
-
-### Mind Map Nodes Overlapping
-- Use the zoom controls to adjust view
-- Click "Fit View" button to see all nodes
-- The graph automatically spaces nodes, but very large graphs may need manual adjustment
-
-### Authentication Issues
-- Verify Firebase configuration in `.env`
-- Check Firebase console for authentication rules
-- Ensure Email/Password authentication is enabled
-
-## 📝 Development
-
-### Running in Development Mode
-
-```bash
-# Terminal 1 - Backend
+code
+Bash
+download
+content_copy
+expand_less
 npm run server
 
-# Terminal 2 - Frontend
+The backend will start on http://localhost:3001.
+
+Terminal 2: Start the Frontend Development Server
+
+code
+Bash
+download
+content_copy
+expand_less
 npm run dev
-```
 
-### Building for Production
+The frontend will be available at http://localhost:5173.
 
-```bash
-npm run build
-```
+6. Access the Application
 
-The built files will be in the `dist/` directory.
+Open your browser and navigate to http://localhost:5173.
 
-### Code Structure
+🎮 How to Use
 
-- **Components**: React functional components with hooks
-- **State Management**: Zustand stores for global state
-- **Styling**: Tailwind CSS with custom theme classes
-- **API Calls**: Fetch API for backend communication
-- **PDF Processing**: Client-side using pdfjs-dist
+Upload a PDF: Drag and drop a PDF file into the application.
 
-## 🤝 Contributing
+Select Text: Highlight any text you find confusing. A button will appear.
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Start Diagnosis: Click the "I'm confused about this" button to open the question modal.
 
-## 📄 License
+Answer Questions: Answer the 5 generated questions using text or voice input.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Review Analysis: Once you submit, the AI analyzes your answers and presents a diagnostic summary and an interactive concept map.
 
-## 🙏 Acknowledgments
+Explore the Map: Zoom and pan the mind map to see how concepts are related. Click "Continue to Learning Path" when ready.
 
-- Google Generative AI (Gemini) for intelligent analysis
-- ReactFlow for graph visualization
-- PDF.js for PDF processing
-- The open-source community for excellent tools and libraries
+Follow Learning Path: Progress through the step-by-step learning cards. You must solve the practice problem on each card to continue.
 
-## 📧 Support
+Track Progress: Your session is automatically saved. Visit the "History" page to review past sessions or resume an incomplete learning path.
 
-For issues, questions, or contributions, please open an issue on GitHub.
+🤝 Contributing
 
----
+We welcome contributions! Please follow these steps:
 
-**Made with ❤️ for students who want to understand, not just memorize.**
+Fork the repository.
+
+Create a new feature branch (git checkout -b feature/amazing-feature).
+
+Commit your changes (git commit -m 'Add amazing feature').
+
+Push to the branch (git push origin feature/amazing-feature).
+
+Open a Pull Request.
+
+📄 License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+🙏 Acknowledgments
+
+CSGirlies Hackathon for motivating us to develop such a good project. 
+
+Google Generative AI (Gemini) for intelligent analysis and generation.
+
+ReactFlow for beautiful graph visualizations.
+
+PDF.js for client-side PDF processing.
+
+Firebase for authentication and data persistence.
+
+The open-source community for their excellent tools and libraries.
