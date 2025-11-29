@@ -19,7 +19,16 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+// CORS configuration - allow requests from localhost and Netlify
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000', // Alternative dev port
+    process.env.NETLIFY_URL, // Your Netlify URL (set in Render env vars)
+    /\.netlify\.app$/, // All Netlify preview deployments
+  ].filter(Boolean), // Remove undefined values
+  credentials: true
+}));
 app.use(express.json());
 
 // Initialize Gemini AI

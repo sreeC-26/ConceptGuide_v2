@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: conceptguide-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm run server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: NETLIFY_URL
+        sync: false
+
