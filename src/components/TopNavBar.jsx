@@ -119,8 +119,19 @@ export default function TopNavBar({ onHomeClick, onHistoryToggle, isHistoryOpen 
           >
             History
           </Link>
-          <Link to="/analytics" className="px-4 py-2 hover:text-pink-400">
-          Analytics
+          <Link 
+            to="/goals" 
+            className="px-4 py-2 rounded-lg transition-all duration-200 hover:opacity-80 inline-flex items-center justify-center text-center"
+            style={historyLinkStyle}
+          >
+            🎯 Goals
+          </Link>
+          <Link 
+            to="/analytics" 
+            className="px-4 py-2 rounded-lg transition-all duration-200 hover:opacity-80 inline-flex items-center justify-center text-center"
+            style={historyLinkStyle}
+          >
+            Analytics
           </Link>
 
           {user ? (
