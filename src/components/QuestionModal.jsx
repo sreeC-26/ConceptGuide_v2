@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import VoiceRecorder from './VoiceRecorder';
+import { ENDPOINTS } from '../config';
 
 const SAMPLE_QUESTIONS = [
   {
@@ -73,7 +74,7 @@ export default function QuestionModal() {
     setIsLoading(true);
     try {
       const { fullText } = useAppStore.getState();
-      const response = await fetch('http://localhost:3001/api/generate-questions', {
+      const response = await fetch(ENDPOINTS.GENERATE_QUESTIONS, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

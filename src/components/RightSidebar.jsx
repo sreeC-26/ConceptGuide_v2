@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
+import { ENDPOINTS } from '../config';
 
 // Helper function to parse text by headings and structure
 const parseTextByStructure = (text) => {
@@ -209,7 +210,7 @@ export default function RightSidebar() {
       // Combine all page texts
       const combinedText = pageTexts.join('\n\n');
       
-      const response = await fetch('http://localhost:3001/api/clean-pdf-content', {
+      const response = await fetch(ENDPOINTS.CLEAN_PDF_CONTENT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rawText: combinedText }),

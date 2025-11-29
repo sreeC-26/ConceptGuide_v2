@@ -21,12 +21,28 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 // CORS configuration - allow requests from localhost and Netlify
 app.use(cors({
-  origin: [
-    'http://localhost:5173', // Vite dev server
-    'http://localhost:3000', // Alternative dev port
-    process.env.NETLIFY_URL, // Your Netlify URL (set in Render env vars)
-    /\.netlify\.app$/, // All Netlify preview deployments
-  ].filter(Boolean), // Remove undefined values
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Allow localhost for development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+    
+    // Allow all Netlify domains
+    if (origin.includes('.netlify.app') || origin.includes('netlify.app')) {
+      return callback(null, true);
+    }
+    
+    // Allow specific Netlify URL if set
+    if (process.env.NETLIFY_URL && origin === process.env.NETLIFY_URL) {
+      return callback(null, true);
+    }
+    
+    // Reject other origins
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json());

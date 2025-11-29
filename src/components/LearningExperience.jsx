@@ -4,6 +4,7 @@ import MindMapPage from './MindMapPage';
 import RepairPath from './RepairPath';
 import Congratulations from './Congratulations';
 import { useAppStore } from '../store/useAppStore';
+import { ENDPOINTS } from '../config';
 
 
 export default function LearningExperience({ sessionData, sessionId }) {
@@ -203,7 +204,7 @@ export default function LearningExperience({ sessionData, sessionId }) {
           hasAnalysisResult: !!analysisResult
         });
 
-        const response = await fetch('http://localhost:3001/api/analyze-and-generate-path', {
+        const response = await fetch(ENDPOINTS.ANALYZE_AND_GENERATE_PATH, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
