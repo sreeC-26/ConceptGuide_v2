@@ -42,7 +42,7 @@ export const useAppStore = create((set, get) => ({
   currentQuestionIndex: 0,
   answers: [],
   showQuestionModal: false,
-  qaData: null, // Complete Q&A data for Person 2's component
+  qaData: null,
 
   // Session / review state
   currentSessionId: null,
@@ -51,22 +51,17 @@ export const useAppStore = create((set, get) => ({
   refreshInsightsTimestamp: null,
 
   // Core actions
-  setPdfData: (data) => set((state) => {
-    // If switching to a new PDF, ensure current session is saved
-    // (sessions are already saved to Firebase when created/updated, so this is just for state)
-    return {
-      fullText: data.fullText || '',
-      pageTexts: data.pageTexts || [],
-      pageCount: data.pageCount || 0,
-      fileName: data.fileName || '',
-      pdfFile: data.pdfFile || null,
-      pdfDocument: data.pdfDocument || null,
-      // Clear current session state when switching PDFs (new session will be created when questions are answered)
-      currentSessionId: null,
-      qaData: null,
-      reviewMode: false,
-      reviewAnalysis: null,
-    };
+  setPdfData: (data) => set({
+    fullText: data.fullText || '',
+    pageTexts: data.pageTexts || [],
+    pageCount: data.pageCount || 0,
+    fileName: data.fileName || '',
+    pdfFile: data.pdfFile || null,
+    pdfDocument: data.pdfDocument || null,
+    currentSessionId: null,
+    qaData: null,
+    reviewMode: false,
+    reviewAnalysis: null,
   }),
 
   setSelection: (selectedText, surroundingContext) => set({
@@ -97,38 +92,33 @@ export const useAppStore = create((set, get) => ({
   }),
 
   setShowQuestionModal: (show) => set({ showQuestionModal: show }),
-
   setQAData: (qaData) => set({ qaData, refreshInsightsTimestamp: Date.now() }),
   setCurrentSessionId: (id) => set({ currentSessionId: id }),
   setReviewMode: (value) => set({ reviewMode: value }),
   setReviewAnalysis: (analysis) => set({ reviewAnalysis: analysis, refreshInsightsTimestamp: Date.now() }),
   setRefreshInsightsTimestamp: (timestamp = Date.now()) => set({ refreshInsightsTimestamp: timestamp }),
 
-      reset: () => set((state) => {
-        // Preserve history when resetting - only clear current session state
-        return {
-          fullText: '',
-          pageTexts: [],
-          pageCount: 0,
-          fileName: '',
-          pdfFile: null,
-          pdfDocument: null,
-          selectedText: '',
-          surroundingContext: '',
-          showConfusionButton: false,
-          questions: [],
-          currentQuestionIndex: 0,
-          answers: [],
-          showQuestionModal: false,
-          qaData: null,
-          currentSessionId: null,
-          reviewMode: false,
-          reviewAnalysis: null,
-          refreshInsightsTimestamp: null,
-          // Keep history intact
-          history: state.history,
-        };
-      }),
+  reset: () => set((state) => ({
+    fullText: '',
+    pageTexts: [],
+    pageCount: 0,
+    fileName: '',
+    pdfFile: null,
+    pdfDocument: null,
+    selectedText: '',
+    surroundingContext: '',
+    showConfusionButton: false,
+    questions: [],
+    currentQuestionIndex: 0,
+    answers: [],
+    showQuestionModal: false,
+    qaData: null,
+    currentSessionId: null,
+    reviewMode: false,
+    reviewAnalysis: null,
+    refreshInsightsTimestamp: null,
+    history: state.history,
+  })),
 
   loadSessionForReview: (sessionId) => {
     if (!sessionId) return;
@@ -137,7 +127,6 @@ export const useAppStore = create((set, get) => ({
 
     const qaPayload = buildQAFromResponses(session.questionResponses);
 
-    // Build complete analysis result from stored session data
     const analysisResult = session.analysisResult || {
       mindMap: session.mindMapData ?? null,
       repairPath: session.repairPathData ?? [],
@@ -145,46 +134,38 @@ export const useAppStore = create((set, get) => ({
       confusionType: session.confusionType ?? null,
       masteryScore: session.masteryScore ?? null,
       levelScores: session.levelScores ?? [],
-      overallAccuracy: session.masteryScore ? session.masteryScore / 100 : 0,
-      overallConfidence: session.masteryScore ? session.masteryScore / 100 : 0,
-      specificGaps: [],
-      secondaryTypes: [],
+      overallAccuracy: session.overallAccuracy ?? (session.masteryScore ? session.masteryScore / 100 : 0),
+      overallConfidence: session.overallConfidence ?? (session.masteryScore ? session.masteryScore / 100 : 0),
+      specificGaps: session.specificGaps ?? [],
+      secondaryTypes: session.secondaryTypes ?? [],
     };
 
-    set((state) => ({
+    set({
       currentSessionId: sessionId,
-      selectedText: session.fullSelectedText ?? session.selectedText ?? state.selectedText,
-      qaData: qaPayload ?? state.qaData,
+      selectedText: session.fullSelectedText ?? session.selectedText ?? '',
+      qaData: qaPayload,
       reviewMode: true,
       reviewAnalysis: analysisResult,
       showQuestionModal: false,
-      history: {
-        ...state.history,
-        currentSessionId: sessionId,
-      },
-    }));
+    });
   },
 
-  exitReviewMode: () => set((state) => ({
+  exitReviewMode: () => set({
     reviewMode: false,
     reviewAnalysis: null,
     qaData: null,
     currentSessionId: null,
-    history: {
-      ...state.history,
-      currentSessionId: null,
-    },
-  })),
+  }),
 
   history: {
     sessions: [],
-    currentSessionId: null,
 
     addSession: (sessionData = {}) => {
       const userId = useAuthStore.getState().user?.uid || null;
       const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const baseText = sessionData.fullSelectedText || '';
-      const normalizedSession = {
+      
+      const newSession = {
         id: sessionData.id || generateId(),
         timestamp: new Date().toISOString(),
         pdfName: sessionData.pdfName ?? get().fileName ?? '',
@@ -200,73 +181,69 @@ export const useAppStore = create((set, get) => ({
         questionResponses: Array.isArray(sessionData.questionResponses) ? sessionData.questionResponses : [],
         diagnosticSummary: sessionData.diagnosticSummary ?? '',
         levelScores: Array.isArray(sessionData.levelScores) ? sessionData.levelScores : [],
+        analysisComplete: sessionData.analysisComplete || false,
+        analysisResult: sessionData.analysisResult ?? null,
+        overallAccuracy: sessionData.overallAccuracy ?? 0,
+        overallConfidence: sessionData.overallConfidence ?? 0,
+        specificGaps: sessionData.specificGaps ?? [],
+        secondaryTypes: sessionData.secondaryTypes ?? [],
       };
 
       set((state) => {
         const existingHistory = state.history || {};
         const existingSessions = existingHistory.sessions || [];
         
-        // Check if session with this ID already exists to prevent duplicates
-        const existingIndex = existingSessions.findIndex(s => s.id === normalizedSession.id);
+        // Check for duplicate
+        const existingIndex = existingSessions.findIndex(s => s.id === newSession.id);
         let updatedSessions;
         
         if (existingIndex >= 0) {
-          // Update existing session instead of creating duplicate
+          // Update existing
           updatedSessions = [...existingSessions];
-          updatedSessions[existingIndex] = { ...updatedSessions[existingIndex], ...normalizedSession };
+          updatedSessions[existingIndex] = { ...existingSessions[existingIndex], ...newSession };
+          console.log('[Store] Updated session:', newSession.id);
         } else {
-          // Add new session at the beginning
-          updatedSessions = [normalizedSession, ...existingSessions];
+          // Add new
+          updatedSessions = [newSession, ...existingSessions];
+          console.log('[Store] Added session:', newSession.id);
         }
 
         return {
-          history: {
-            ...existingHistory,
-            sessions: updatedSessions,
-            currentSessionId: normalizedSession.id,
-          },
-          currentSessionId: normalizedSession.id,
+          history: { ...existingHistory, sessions: updatedSessions },
+          currentSessionId: newSession.id,
           reviewMode: false,
           reviewAnalysis: null,
           refreshInsightsTimestamp: Date.now(),
         };
       });
 
-      if (userId) {
-        (async () => {
-          try {
-            await saveSessionToFirebase(userId, normalizedSession);
-          } catch (error) {
-            console.error('Failed to save session to Firebase:', error);
-          }
-        })();
+      // Only save to Firebase if session has analysis complete
+      // (Initial session creation just stores locally, Firebase save happens after analysis)
+      if (userId && newSession.analysisComplete) {
+        saveSessionToFirebase(userId, newSession)
+          .then(() => console.log('[Store] Saved to Firebase:', newSession.id))
+          .catch(err => console.error('[Store] Firebase save error:', err));
       }
 
-      return normalizedSession.id;
+      return newSession.id;
     },
 
     getSessionById: (id) => {
       const { history } = get();
-      if (!history || !Array.isArray(history.sessions)) return null;
-      return history.sessions.find((session) => session.id === id) || null;
+      if (!history?.sessions) return null;
+      return history.sessions.find((s) => s.id === id) || null;
     },
 
     deleteSession: (id) => {
       const userId = useAuthStore.getState().user?.uid || null;
-      const exitReviewMode = get().exitReviewMode;
 
       set((state) => {
         const existingHistory = state.history || {};
-        const filteredSessions = (existingHistory.sessions || []).filter((session) => session.id !== id);
-        const isDeletingCurrent = existingHistory.currentSessionId === id || state.currentSessionId === id;
-        const newCurrentId = isDeletingCurrent ? null : existingHistory.currentSessionId;
+        const filtered = (existingHistory.sessions || []).filter((s) => s.id !== id);
+        const isDeletingCurrent = state.currentSessionId === id;
 
         return {
-          history: {
-            ...existingHistory,
-            sessions: filteredSessions,
-            currentSessionId: newCurrentId,
-          },
+          history: { ...existingHistory, sessions: filtered },
           currentSessionId: isDeletingCurrent ? null : state.currentSessionId,
           reviewMode: isDeletingCurrent ? false : state.reviewMode,
           reviewAnalysis: isDeletingCurrent ? null : state.reviewAnalysis,
@@ -276,68 +253,87 @@ export const useAppStore = create((set, get) => ({
       });
 
       if (userId) {
-        (async () => {
-          try {
-            await deleteSessionFromFirebase(userId, id);
-          } catch (error) {
-            console.error('Failed to delete session from Firebase:', error);
-          }
-        })();
-      }
-
-      if (get().currentSessionId === null) {
-        exitReviewMode();
+        deleteSessionFromFirebase(userId, id).catch(console.error);
       }
     },
 
     getAllSessions: () => {
       const { history } = get();
-      if (!history || !Array.isArray(history.sessions)) return [];
+      if (!history?.sessions) return [];
       return [...history.sessions].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     },
 
     updateSessionProgress: (id, completedSteps, timeSpent, updates = {}) => {
       const userId = useAuthStore.getState().user?.uid || null;
 
+      let updatedSession = null;
+      
       set((state) => {
         const existingHistory = state.history || {};
         const updatedSessions = (existingHistory.sessions || []).map((session) => {
           if (session.id !== id) return session;
-          return {
+          
+          // Build updated session with all data
+          updatedSession = {
             ...session,
             completedSteps: typeof completedSteps === 'number' ? completedSteps : session.completedSteps,
-            timeSpent: typeof timeSpent === 'number' ? timeSpent : session.timeSpent,
+            timeSpent: typeof timeSpent === 'number' ? (session.timeSpent || 0) + timeSpent : session.timeSpent,
             ...updates,
           };
+          
+          // Ensure analysisComplete is set properly
+          if (updates.analysisComplete || updates.analysisResult) {
+            updatedSession.analysisComplete = true;
+          }
+          
+          return updatedSession;
         });
 
         return {
-          history: {
-            ...existingHistory,
-            sessions: updatedSessions,
-          },
-          refreshInsightsTimestamp: Date.now(), // Trigger history refresh
+          history: { ...existingHistory, sessions: updatedSessions },
+          refreshInsightsTimestamp: updates.analysisComplete ? Date.now() : state.refreshInsightsTimestamp,
         };
       });
 
-      if (userId) {
-        const payload = { ...updates };
+      // Save to Firebase
+      if (userId && updatedSession) {
+        // Clean the session data for Firebase (remove circular references, ensure serializable)
+        const cleanSession = {
+          id: updatedSession.id,
+          timestamp: updatedSession.timestamp,
+          pdfName: updatedSession.pdfName || '',
+          selectedText: updatedSession.selectedText || '',
+          fullSelectedText: updatedSession.fullSelectedText || '',
+          confusionType: updatedSession.confusionType || null,
+          masteryScore: updatedSession.masteryScore || null,
+          timeSpent: updatedSession.timeSpent || 0,
+          totalSteps: updatedSession.totalSteps || 0,
+          completedSteps: updatedSession.completedSteps || 0,
+          analysisComplete: updatedSession.analysisComplete || false,
+          diagnosticSummary: updatedSession.diagnosticSummary || '',
+          overallAccuracy: updatedSession.overallAccuracy || 0,
+          overallConfidence: updatedSession.overallConfidence || 0,
+          questionResponses: Array.isArray(updatedSession.questionResponses) ? updatedSession.questionResponses : [],
+          levelScores: Array.isArray(updatedSession.levelScores) ? updatedSession.levelScores : [],
+          specificGaps: Array.isArray(updatedSession.specificGaps) ? updatedSession.specificGaps : [],
+          secondaryTypes: Array.isArray(updatedSession.secondaryTypes) ? updatedSession.secondaryTypes : [],
+          // Store mind map and repair path as serializable data
+          mindMapData: updatedSession.mindMapData || updatedSession.analysisResult?.mindMap || null,
+          repairPathData: updatedSession.repairPathData || updatedSession.analysisResult?.repairPath || [],
+        };
 
-        if (typeof completedSteps === 'number') {
-          payload.completedSteps = completedSteps;
-        }
-        if (typeof timeSpent === 'number') {
-          payload.timeSpent = timeSpent;
-        }
-
-        if (Object.keys(payload).length > 0) {
-          (async () => {
-            try {
-              await updateSessionInFirebase(userId, id, payload);
-            } catch (error) {
-              console.error('Failed to update session in Firebase:', error);
-            }
-          })();
+        // If analysis is complete, save the full session
+        if (updates.analysisComplete || updatedSession.analysisComplete) {
+          console.log('[Store] Saving complete session to Firebase:', id);
+          saveSessionToFirebase(userId, cleanSession)
+            .then(() => console.log('[Store] Saved to Firebase successfully:', id))
+            .catch(err => console.error('[Store] Firebase save error:', err));
+        } else if (typeof completedSteps === 'number' || typeof timeSpent === 'number') {
+          // Just update progress fields
+          const progressUpdate = {};
+          if (typeof completedSteps === 'number') progressUpdate.completedSteps = completedSteps;
+          if (typeof timeSpent === 'number') progressUpdate.timeSpent = cleanSession.timeSpent;
+          updateSessionInFirebase(userId, id, progressUpdate).catch(console.error);
         }
       }
     },
@@ -345,52 +341,34 @@ export const useAppStore = create((set, get) => ({
 
   syncSessionsFromFirebase: async () => {
     const userId = useAuthStore.getState().user?.uid;
-    if (!userId) {
-      return [];
-    }
+    if (!userId) return [];
 
     try {
       const remoteSessions = await fetchUserSessions(userId);
-      const sortedSessions = [...remoteSessions].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
-
+      console.log('[Store] Fetched sessions from Firebase:', remoteSessions.length);
+      
       set((state) => {
         const existingHistory = state.history || {};
         const existingSessions = existingHistory.sessions || [];
-        const previousCurrentId = state.currentSessionId || existingHistory.currentSessionId || null;
         
-        // Merge remote sessions with existing ones, avoiding duplicates
+        // Merge sessions
         const sessionMap = new Map();
-        // First add existing sessions
-        existingSessions.forEach(session => {
-          sessionMap.set(session.id, session);
-        });
-        // Then add/update with remote sessions
-        sortedSessions.forEach(session => {
-          sessionMap.set(session.id, session);
-        });
+        existingSessions.forEach(s => s.id && sessionMap.set(s.id, s));
+        remoteSessions.forEach(s => s.id && sessionMap.set(s.id, { ...sessionMap.get(s.id), ...s }));
         
-        const mergedSessions = Array.from(sessionMap.values()).sort(
+        const merged = Array.from(sessionMap.values()).sort(
           (a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0)
         );
-        
-        const hasPrevious = mergedSessions.some((session) => session.id === previousCurrentId);
-        const newCurrentId = hasPrevious ? previousCurrentId : (mergedSessions[0]?.id ?? null);
 
         return {
-          history: {
-            ...existingHistory,
-            sessions: mergedSessions,
-            currentSessionId: newCurrentId,
-          },
-          currentSessionId: newCurrentId,
-          reviewMode: hasPrevious ? state.reviewMode : false,
-          reviewAnalysis: hasPrevious ? state.reviewAnalysis : null,
+          history: { ...existingHistory, sessions: merged },
+          refreshInsightsTimestamp: Date.now(),
         };
       });
 
-      return sortedSessions;
+      return remoteSessions;
     } catch (error) {
-      console.error('Failed to sync sessions from Firebase:', error);
+      console.error('[Store] Sync error:', error);
       return [];
     }
   },

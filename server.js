@@ -629,13 +629,55 @@ Return only valid JSON, no additional text.`;
 
     let repairPathJson;
     try {
-      const cleanedText = repairPathText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      // Try multiple parsing strategies
+      let cleanedText = repairPathText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // Try to find JSON object in the text
+      const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanedText = jsonMatch[0];
+      }
+      
       const parsed = JSON.parse(cleanedText);
-      repairPathJson = parsed.steps || parsed;
-      console.log('[API] Repair path JSON parsed successfully, steps:', repairPathJson?.length || 0);
+      repairPathJson = Array.isArray(parsed.steps) ? parsed.steps : (Array.isArray(parsed) ? parsed : []);
+      
+      // Validate that we have proper step data with all required fields
+      if (repairPathJson.length === 0) {
+        throw new Error('No steps in repair path');
+      }
+      
+      // Validate and ensure each step has all required fields
+      repairPathJson = repairPathJson.map((step, idx) => {
+        if (!step.conceptName || !step.explanation) {
+          throw new Error(`Step ${idx + 1} missing required fields: conceptName or explanation`);
+        }
+        // Ensure practiceProblem has all fields
+        if (step.practiceProblem) {
+          if (!step.practiceProblem.question || !step.practiceProblem.options || !step.practiceProblem.correctAnswer) {
+            console.warn(`[API] Step ${idx + 1} has incomplete practiceProblem, fixing...`);
+            step.practiceProblem = {
+              question: step.practiceProblem.question || `Practice question about ${step.conceptName}?`,
+              options: step.practiceProblem.options || ['A) Option 1', 'B) Option 2', 'C) Option 3', 'D) Option 4'],
+              correctAnswer: step.practiceProblem.correctAnswer || 'A) Option 1',
+              explanation: step.practiceProblem.explanation || `Solution explanation for ${step.conceptName}`,
+            };
+          }
+        }
+        return step;
+      });
+      
+      console.log('[API] Repair path JSON parsed successfully, steps:', repairPathJson.length);
+      console.log('[API] First step validation:', {
+        hasConceptName: !!repairPathJson[0].conceptName,
+        hasExplanation: !!repairPathJson[0].explanation,
+        hasExamples: !!repairPathJson[0].examples,
+        hasPracticeProblem: !!repairPathJson[0].practiceProblem,
+        practiceProblemComplete: repairPathJson[0].practiceProblem ? 
+          (!!repairPathJson[0].practiceProblem.question && !!repairPathJson[0].practiceProblem.options) : false
+      });
     } catch (parseError) {
       console.error('[API] Failed to parse repair path JSON:', parseError);
-      console.error('[API] Raw response:', repairPathText.substring(0, 500));
+      console.error('[API] Raw response (first 1000 chars):', repairPathText.substring(0, 1000));
       const fallbackNodes =
         sortedNodes.length > 0
           ? sortedNodes

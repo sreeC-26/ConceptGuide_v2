@@ -74,17 +74,28 @@ export default function HistoryPanel() {
   const [sortOrder, setSortOrder] = useState('newest');
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+  // --- START MODIFIED SECTION ---
   const filteredSessions = useMemo(() => {
+    // Show sessions that have analysis data (either analysisComplete flag or analysisResult)
+    const completeSessions = sessions.filter(s => 
+      s.analysisComplete === true || 
+      s.analysisResult != null ||
+      s.masteryScore != null ||
+      s.confusionType != null
+    );
+    
+    console.log('[HistoryPanel] Total:', sessions.length, 'With analysis:', completeSessions.length);
+    
     const normalizedSearch = search.trim().toLowerCase();
-
+  
     const searched = normalizedSearch
-      ? sessions.filter((session) => {
+      ? completeSessions.filter((session) => {
           const pdfName = session.pdfName?.toLowerCase() ?? '';
           const selected = session.fullSelectedText?.toLowerCase() ?? session.selectedText?.toLowerCase() ?? '';
           return pdfName.includes(normalizedSearch) || selected.includes(normalizedSearch);
         })
-      : sessions.slice();
-
+      : completeSessions.slice();
+  
     const sorter = (a, b) => {
       if (sortOrder === 'newest') {
         return new Date(b.timestamp || 0) - new Date(a.timestamp || 0);
@@ -100,11 +111,13 @@ export default function HistoryPanel() {
       }
       return 0;
     };
-
+  
     return searched.sort(sorter);
   }, [sessions, search, sortOrder]);
-
-  const sessionCount = sessions.length;
+  
+  // Update session count to show complete sessions
+  const sessionCount = filteredSessions.length;
+  // --- END MODIFIED SECTION ---
 
   const handleReview = (sessionId) => {
     if (!sessionId || !loadSessionForReview) return;
@@ -140,12 +153,6 @@ export default function HistoryPanel() {
 
   return (
     <div className="h-full flex flex-col" style={{ backgroundColor: '#1A1A1A' }}>
-      <InsightsPanel
-        sessions={sessions}
-        refreshKey={refreshInsightsTimestamp}
-        onRefresh={() => setRefreshInsightsTimestamp(Date.now())}
-      />
-
       <div className="px-6 py-5 border-b border-pink-500/30 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-semibold text-white" style={{ fontFamily: 'Poppins, sans-serif' }}>

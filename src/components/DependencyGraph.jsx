@@ -188,14 +188,6 @@ export default function DependencyGraph({ mindMap, onComplete }) {
           <span className="mr-2">🗺️</span>
           Concept Dependency Map
         </h2>
-        {onComplete && (
-          <button
-            onClick={onComplete}
-            className="btn-primary"
-          >
-            Continue to Learning Path →
-          </button>
-        )}
       </div>
 
       <div className="mb-4 space-y-2">

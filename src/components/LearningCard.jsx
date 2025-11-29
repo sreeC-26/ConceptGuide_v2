@@ -8,15 +8,15 @@ function LearningCardContent({ step, onMarkComplete, isLastStep, sharedAnswer, o
   const [showSolution, setShowSolution] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
 
+  // Reset state when step changes (key change should handle this, but just in case)
   useEffect(() => {
     setShowSolution(false);
-  }, []);
+    setSelectedAnswer(null);
+  }, [step?.stepNumber, step?.conceptName]);
 
   useEffect(() => {
     if (sharedAnswer !== null && sharedAnswer !== undefined) {
       setSelectedAnswer(sharedAnswer);
-    } else {
-      setSelectedAnswer(null);
     }
   }, [sharedAnswer]);
 

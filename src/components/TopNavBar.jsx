@@ -119,6 +119,9 @@ export default function TopNavBar({ onHomeClick, onHistoryToggle, isHistoryOpen 
           >
             History
           </Link>
+          <Link to="/analytics" className="px-4 py-2 hover:text-pink-400">
+          Analytics
+          </Link>
 
           {user ? (
             <button

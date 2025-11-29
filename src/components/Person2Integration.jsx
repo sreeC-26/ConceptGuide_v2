@@ -1,15 +1,12 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import LearningExperience from './LearningExperience';
 
-/**
- * Integration Point for Person 2's Component
- *
- * This component renders Person 2's LearningExperience component
- * after the user completes all 5 questions.
- */
 export default function Person2Integration({ questions, answers, selectedText, surroundingContext }) {
-  const { currentSessionId, history, setCurrentSessionId, fileName } = useAppStore();
+  const currentSessionId = useAppStore((state) => state.currentSessionId);
+  const setCurrentSessionId = useAppStore((state) => state.setCurrentSessionId);
+  const fileName = useAppStore((state) => state.fileName);
+  const hasCreatedSessionRef = useRef(false);
 
   const qaPairs = useMemo(() => {
     if (!Array.isArray(questions) || !Array.isArray(answers) || questions.length === 0) {
@@ -17,19 +14,29 @@ export default function Person2Integration({ questions, answers, selectedText, s
     }
 
     return questions.map((question, index) => {
-      const questionText = typeof question === 'string' ? question : question.question || question;
+      const questionObj = typeof question === 'object' ? question : { question: question };
+      
       return {
-        question: questionText,
+        question: questionObj.question || questionObj,
         answer: answers[index] || '',
+        level: questionObj.level || index + 1,
+        type: questionObj.type || ['Vocabulary/Definition', 'Purpose/Motivation', 'Foundation/Prerequisites', 'Misconception Check', 'Application/Real-world'][index],
+        expectedKeywords: questionObj.expectedKeywords || []
       };
     });
   }, [questions, answers]);
 
+  // Create session only once
   useEffect(() => {
-    // Only create session if we don't have one and we have Q&A pairs
-    if (!history?.addSession || currentSessionId || qaPairs.length === 0) {
+    if (hasCreatedSessionRef.current || currentSessionId || qaPairs.length === 0) {
       return;
     }
+
+    console.log('[Person2Integration] Creating session with qaPairs:', qaPairs.length);
+    hasCreatedSessionRef.current = true;
+
+    const history = useAppStore.getState().history;
+    if (!history?.addSession) return;
 
     const newSessionId = history.addSession({
       fullSelectedText: selectedText || '',
@@ -37,37 +44,22 @@ export default function Person2Integration({ questions, answers, selectedText, s
       questionResponses: qaPairs.map((qa, index) => ({
         question: qa.question,
         answer: qa.answer,
-        level: index + 1,
+        level: qa.level || index + 1,
+        type: qa.type,
+        expectedKeywords: qa.expectedKeywords
       })),
     });
 
-    if (newSessionId && setCurrentSessionId) {
+    if (newSessionId) {
       setCurrentSessionId(newSessionId);
     }
-  }, [history, currentSessionId, setCurrentSessionId, selectedText, fileName, qaPairs]);
-
-  // Also update session if it already exists but doesn't have questionResponses
-  useEffect(() => {
-    if (!currentSessionId || !history?.updateSessionProgress || qaPairs.length === 0) {
-      return;
-    }
-
-    const session = history.getSessionById?.(currentSessionId);
-    if (session && (!session.questionResponses || session.questionResponses.length === 0)) {
-      history.updateSessionProgress(currentSessionId, undefined, undefined, {
-        questionResponses: qaPairs.map((qa, index) => ({
-          question: qa.question,
-          answer: qa.answer,
-          level: index + 1,
-        })),
-      });
-    }
-  }, [currentSessionId, history, qaPairs]);
+  }, [currentSessionId, setCurrentSessionId, selectedText, fileName, qaPairs]);
 
   const sessionData = useMemo(() => {
     if (qaPairs.length === 0) {
       return null;
     }
+    
     return {
       selectedText: selectedText || '',
       qaPairs,

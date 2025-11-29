@@ -1,108 +1,101 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import LearningCard from './LearningCard'
 import { useAppStore } from '../store/useAppStore'
 
+export default function RepairPath({ steps, onComplete, sessionId }) {
+  const currentSessionId = useAppStore((state) => state.currentSessionId)
+  const [currentStepIndex, setCurrentStepIndex] = useState(0)
+  const [sharedAnswers, setSharedAnswers] = useState({})
+  const startTimeRef = useRef(Date.now())
+  const hasInitializedRef = useRef(false)
 
-export default function RepairPath({ steps, onComplete, onProgressUpdate, sessionId }) {
-  const { history, currentSessionId } = useAppStore()
+  // Get the session ID to use
+  const sessionIdToUse = sessionId || currentSessionId
 
-
-  // Restore progress from session if available
-  const getInitialStepIndex = () => {
-    const sessionIdToUse = sessionId || currentSessionId;
-    if (sessionIdToUse && history?.getSessionById && steps && steps.length > 0) {
-      const session = history.getSessionById(sessionIdToUse);
-      if (session?.completedSteps !== undefined && session?.totalSteps) {
-        // If completed, don't restore (should show congratulations)
-        if (session.completedSteps >= session.totalSteps) {
-          return 0;
-        }
-        // Restore to the current step (completedSteps is the index we should be on)
-        // Ensure it's within bounds
-        const restoredIndex = Math.min(session.completedSteps, steps.length - 1);
-        return Math.max(0, restoredIndex);
-      }
-    }
-    return 0;
-  };
-
-
-  const [currentStepIndex, setCurrentStepIndex] = useState(getInitialStepIndex);
-  const [sharedAnswers, setSharedAnswers] = useState({}) // Store answers across steps
-
-
-  // Restore progress when sessionId or steps change
+  // Restore progress on mount
   useEffect(() => {
-    const sessionIdToUse = sessionId || currentSessionId;
-    if (sessionIdToUse && history?.getSessionById && steps.length > 0) {
-      const session = history.getSessionById(sessionIdToUse);
-      if (session?.completedSteps !== undefined && session?.totalSteps) {
-        // If not completed, restore to the saved step
-        if (session.completedSteps < session.totalSteps) {
-          const restoredIndex = Math.min(session.completedSteps, steps.length - 1);
-          const validIndex = Math.max(0, restoredIndex);
-          setCurrentStepIndex(validIndex);
-        }
+    if (hasInitializedRef.current) return
+    if (!sessionIdToUse || !steps || steps.length === 0) return
+    
+    const history = useAppStore.getState().history
+    if (!history?.getSessionById) return
+    
+    const session = history.getSessionById(sessionIdToUse)
+    if (session?.completedSteps !== undefined && session?.totalSteps) {
+      if (session.completedSteps < session.totalSteps) {
+        const restoredIndex = Math.min(session.completedSteps, steps.length - 1)
+        setCurrentStepIndex(Math.max(0, restoredIndex))
       }
     }
-  }, [sessionId, currentSessionId, history, steps.length]);
+    hasInitializedRef.current = true
+  }, [sessionIdToUse, steps])
 
-
-  const currentStep = steps[currentStepIndex];
-  const isFirstStep = currentStepIndex === 0;
-  const isLastStep = currentStepIndex === steps.length - 1;
-  const progress = ((currentStepIndex + 1) / steps.length) * 100;
-
+  const currentStep = steps[currentStepIndex]
+  const isFirstStep = currentStepIndex === 0
+  const isLastStep = currentStepIndex === steps.length - 1
+  const progress = steps.length > 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0
 
   const handlePrevious = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
-      // Notify parent of progress change
-      if (onProgressUpdate) {
-        onProgressUpdate(currentStepIndex - 1, steps.length);
-      }
+      setCurrentStepIndex(prev => prev - 1)
     }
-  };
-
+  }
 
   const handleMarkComplete = () => {
-    const sessionIdToUse = sessionId || currentSessionId;
-   
-    // First, check if we are on the last step
+    console.log('[RepairPath] handleMarkComplete called, currentStepIndex:', currentStepIndex, 'isLastStep:', isLastStep)
+    
+    // Calculate time spent
+    const elapsedMinutes = Math.max(1, Math.floor((Date.now() - startTimeRef.current) / (1000 * 60)))
+    
     if (isLastStep) {
-      // If so, update progress to full completion and call the onComplete prop
-      if (history?.updateSessionProgress && sessionIdToUse) {
-        history.updateSessionProgress(sessionIdToUse, steps.length, undefined, {
-          completedSteps: steps.length,
-          totalSteps: steps.length,
-        });
+      // Save progress to store if we have a session
+      if (sessionIdToUse) {
+        const history = useAppStore.getState().history
+        if (history?.updateSessionProgress) {
+          history.updateSessionProgress(sessionIdToUse, steps.length, elapsedMinutes, {
+            completedSteps: steps.length,
+            totalSteps: steps.length,
+          })
+        }
       }
+      // Call onComplete to show congratulations
       if (onComplete) {
-        onComplete();
+        onComplete()
       }
     } else {
-      // If not on the last step, just advance to the next step
-      const newIndex = currentStepIndex + 1;
-      setCurrentStepIndex(newIndex);
- 
-      // Then, save the new progress to the history store
-      if (history?.updateSessionProgress && sessionIdToUse) {
-        history.updateSessionProgress(sessionIdToUse, newIndex, undefined, {
-          completedSteps: newIndex,
-          totalSteps: steps.length,
-        });
+      // Advance to next step
+      const newIndex = currentStepIndex + 1
+      console.log('[RepairPath] Advancing to step:', newIndex)
+      setCurrentStepIndex(newIndex)
+      startTimeRef.current = Date.now()
+      
+      // Save progress to store if we have a session
+      if (sessionIdToUse) {
+        const history = useAppStore.getState().history
+        if (history?.updateSessionProgress) {
+          history.updateSessionProgress(sessionIdToUse, newIndex, elapsedMinutes, {
+            completedSteps: newIndex,
+            totalSteps: steps.length,
+          })
+        }
       }
     }
-  };
-
+  }
 
   const handleAnswerChange = (stepNumber, answer) => {
-    setSharedAnswers((prev) => ({
+    setSharedAnswers(prev => ({
       ...prev,
       [stepNumber]: answer
-    }));
-  };
+    }))
+  }
 
+  if (!steps || steps.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-pink-400">No learning steps available.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="gradient-border rounded-lg p-6">
@@ -111,6 +104,7 @@ export default function RepairPath({ steps, onComplete, onProgressUpdate, sessio
         <div className="window-dot window-dot-yellow"></div>
         <div className="window-dot window-dot-green"></div>
       </div>
+      
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-2xl flex items-center" style={{ fontFamily: 'Poppins, sans-serif', color: '#FFFFFF', fontSize: '2rem' }}>
@@ -121,7 +115,6 @@ export default function RepairPath({ steps, onComplete, onProgressUpdate, sessio
             Step {currentStepIndex + 1} of {steps.length}
           </span>
         </div>
-
 
         {/* Progress bar */}
         <div className="w-full rounded-full h-2.5 mb-4" style={{ backgroundColor: '#1A1A1A' }}>
@@ -134,10 +127,9 @@ export default function RepairPath({ steps, onComplete, onProgressUpdate, sessio
           ></div>
         </div>
 
-
         {/* Step indicators */}
         <div className="flex gap-2 justify-center flex-wrap">
-          {steps.map((step, index) => (
+          {steps.map((_, index) => (
             <div
               key={index}
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
@@ -160,33 +152,27 @@ export default function RepairPath({ steps, onComplete, onProgressUpdate, sessio
         </div>
       </div>
 
-
-      <div className="flex gap-4 mb-4">
-        {!isFirstStep && (
+      {!isFirstStep && (
+        <div className="flex gap-4 mb-4">
           <button
             onClick={handlePrevious}
             className="btn-secondary flex-1"
           >
             ← Previous Step
           </button>
-        )}
-        <div className={isFirstStep ? 'flex-1' : 'hidden'}></div>
-      </div>
-
+        </div>
+      )}
 
       {currentStep && (
         <LearningCard
-          key={currentStep.stepNumber} // Force remount when step changes
+          key={`step-${currentStepIndex}`}
           step={currentStep}
           onMarkComplete={handleMarkComplete}
           isLastStep={isLastStep}
-          sharedAnswer={sharedAnswers[currentStep.stepNumber] || undefined}
+          sharedAnswer={sharedAnswers[currentStep.stepNumber]}
           onAnswerChange={(answer) => handleAnswerChange(currentStep.stepNumber, answer)}
         />
       )}
     </div>
-  );
+  )
 }
-
-
-
